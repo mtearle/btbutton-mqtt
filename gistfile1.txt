@@ -1,0 +1,9 @@
+The full paths of the file are:
+/etc/udev/rules.d/99-lifx-keyboard.rules
+/etc/systemd/system/lifx-remote@.service
+/usr/local/bin/lifx-remote.py
+
+Install the python dependancies lister in requirements.txt using pip.
+
+If you have multiple remote, you could filter them in the udev rule.
+It should work with multiple bulb, but I haven't tested that.

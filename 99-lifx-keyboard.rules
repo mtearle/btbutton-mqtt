@@ -1,0 +1,1 @@
+ACTION=="add", SUBSYSTEM=="input", ATTRS{name}=="AB Shutter3            ", TAG+="systemd", PROGRAM="/bin/systemd-escape -p --template=lifx-remote@.service $env{DEVNAME}", ENV{SYSTEMD_WANTS}+="%c"
