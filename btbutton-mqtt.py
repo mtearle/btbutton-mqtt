@@ -53,13 +53,12 @@ def on_log(mosq, obj, level, string):
 import evdev
 import ConfigParser
 
-def button(config, device, id, key):
+def send_mqtt_message(config, topic, message):
     host = config.get('mqtt','host')
     port = config.get('mqtt','port')
     user = config.get('mqtt','user')
     password = config.get('mqtt','password')
 
-    print "device %s id %s key %s" % (device,id,key)
     mqttc = mosquitto.Mosquitto()
 
     # Assign event callbacks
@@ -76,14 +75,23 @@ def button(config, device, id, key):
     mqttc.connect(host, port)
 
     # Start subscribe, with QoS level 0
-    mqttc.subscribe("test", 0)
+    mqttc.subscribe(topic, 0)
 
     # 
     # Publish a message
-    mqttc.publish("test", "%s %s" % (id,key))
+    mqttc.publish(topic, message)
 
     mqttc.disconnect()
 
+
+def button(config, device, id, key):
+    print "device %s id %s key %s" % (device,id,key)
+
+    topic = "homeassistant/binary_sensor/btbutton/%s_%s/state" % (id,key)
+    payload = "ON"
+    send_mqtt_message(config,topic,payload)
+    payload = "OFF"
+    send_mqtt_message(config,topic,payload)
 
 
 def big_button(config, device, id):
@@ -96,6 +104,15 @@ def main(path,description):
     # load mqtt config (host, port, user, password)
     config = ConfigParser.ConfigParser()
     config.read(['/etc/btbutton.cfg','btbutton.cfg'])
+    #
+
+    # send mqtt discovery for homeassistant
+
+    payload = '{"name":"btbutton", "device_class":"motion"}'
+    topic = "homeassistant/binary_sensor/btbutton/%s_big/config" % (description)
+    send_mqtt_message(config,topic,payload)
+    topic = "homeassistant/binary_sensor/btbutton/%s_small/config" % (description)
+    send_mqtt_message(config,topic,payload)
     #
 
     device = evdev.InputDevice(path)
