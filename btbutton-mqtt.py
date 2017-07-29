@@ -134,7 +134,7 @@ def main(path,description):
             print "..."
 
 def usage():
-   print("usage: lifx-remote.py /dev/input/event?")
+   print("usage: btbutton-mqtt.py </dev/input/event?> <description>")
 
 if __name__ == '__main__':
    import sys
