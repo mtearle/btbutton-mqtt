@@ -1,0 +1,6 @@
+[Unit]
+Description=btbutton remote on %I
+
+[Service]
+ExecStart=/usr/local/bin/btbutton-mqtt.py /%I
+Type=simple

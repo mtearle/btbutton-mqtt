@@ -1,2 +1,3 @@
 evdev
-lifx-sdk
+pyudev
+mosquitto

@@ -32,6 +32,26 @@
 
 import mosquitto
 import os
+import pyudev
+import evdev
+import ConfigParser
+import re
+
+def find_uniq(dev):
+    while dev:
+    	 print dev
+    	 if dev.get("UNIQ"):
+	 	return dev.get("UNIQ")
+         dev = dev.parent
+	
+def find_by_devname(context, name):
+    for device in context.list_devices():
+    	if device.get("DEVNAME") == name:
+		return device
+
+def clean_id(id):
+    return str(re.sub(r'[^a-fA-F0-9]',r'',id))
+
  
 # Define event callbacks
 def on_connect(mosq, obj, rc):
@@ -48,10 +68,6 @@ def on_subscribe(mosq, obj, mid, granted_qos):
 
 def on_log(mosq, obj, level, string):
     print(string)
-
-
-import evdev
-import ConfigParser
 
 def send_mqtt_message(config, topic, message):
     host = config.get('mqtt','host')
@@ -87,7 +103,7 @@ def send_mqtt_message(config, topic, message):
 def button(config, device, id, key):
     print "device %s id %s key %s" % (device,id,key)
 
-    topic = "homeassistant/binary_sensor/btbutton/%s_%s/state" % (id,key)
+    topic = "homeassistant/binary_sensor/btbutton/button%s_%s/state" % (id,key)
     payload = "ON"
     send_mqtt_message(config,topic,payload)
     payload = "OFF"
@@ -100,7 +116,15 @@ def big_button(config, device, id):
 def small_button(config, device, id):
     button(config, device, id, "small")
 
-def main(path,description):
+def main(path):
+
+    # path is /dev/input/eventX
+    # need to find uniq hardware (BT address of button)
+    context = pyudev.Context()
+    device = find_by_devname(context,path)
+    description = clean_id(find_uniq(device))
+
+
     # load mqtt config (host, port, user, password)
     config = ConfigParser.ConfigParser()
     config.read(['/etc/btbutton.cfg','btbutton.cfg'])
@@ -109,9 +133,9 @@ def main(path,description):
     # send mqtt discovery for homeassistant
 
     payload = '{"name":"btbutton", "device_class":"motion"}'
-    topic = "homeassistant/binary_sensor/btbutton/%s_big/config" % (description)
+    topic = "homeassistant/binary_sensor/btbutton/button%s_big/config" % (description)
     send_mqtt_message(config,topic,payload)
-    topic = "homeassistant/binary_sensor/btbutton/%s_small/config" % (description)
+    topic = "homeassistant/binary_sensor/btbutton/button%s_small/config" % (description)
     send_mqtt_message(config,topic,payload)
     #
 
@@ -134,12 +158,12 @@ def main(path,description):
             print "..."
 
 def usage():
-   print("usage: btbutton-mqtt.py </dev/input/event?> <description>")
+   print("usage: btbutton-mqtt.py </dev/input/event?>")
 
 if __name__ == '__main__':
    import sys
    if len(sys.argv) > 1:
-       main(sys.argv[1],sys.argv[2])
+       main(sys.argv[1])
    else:
       usage()
 

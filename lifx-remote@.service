@@ -1,6 +1,0 @@
-[Unit]
-Description=lifx remote on %I
-
-[Service]
-ExecStart=/usr/local/bin/lifx-remote.py /%I
-Type=simple
