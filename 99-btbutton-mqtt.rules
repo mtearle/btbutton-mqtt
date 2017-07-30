@@ -1,2 +1,1 @@
-ACTION=="add", SUBSYSTEM=="input", ATTRS{name}=="AB Shutter3", ATTRS{uniq}=="62:02:10:00:0b:50", TAG+="systemd", PROGRAM="/bin/systemd-escape -p --template=btbutton-mqtt@.service $env{DEVNAME}", ENV{SYSTEMD_WANTS}+="%c"
-ACTION=="add", SUBSYSTEM=="input", ATTRS{name}=="AB Shutter3", ATTRS{uniq}=="62:02:10:00:03:70", TAG+="systemd", PROGRAM="/bin/systemd-escape -p --template=btbutton-mqtt@.service $env{DEVNAME}", ENV{SYSTEMD_WANTS}+="%c"
+ACTION=="add", SUBSYSTEM=="input", ATTRS{name}=="AB Shutter3", TAG+="systemd", PROGRAM="/bin/systemd-escape -p --template=btbutton-mqtt@.service $env{DEVNAME}", ENV{SYSTEMD_WANTS}+="%c"
