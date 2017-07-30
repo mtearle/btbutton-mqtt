@@ -6,7 +6,7 @@
 # Integration by Mark Tearle <mark@tearle.com>
 
 
-# Based on LiFX Btbutton code by Loïc Damien <loic.damien@dzamlo.ch>
+# Based on LiFX Btbutton code by Loic Damien <loic.damien@dzamlo.ch>
 
 # Includes example code from paho-mqtt website by:
 
@@ -48,7 +48,7 @@ import re
 
 def find_uniq(dev):
     while dev:
-    	 print dev
+    	 #print dev
     	 if dev.get("UNIQ"):
 	 	return dev.get("UNIQ")
          dev = dev.parent
@@ -66,19 +66,19 @@ def clean_id(id):
 
 # Define event callbacks
 def on_connect(mosq, obj, rc):
-    print("rc: " + str(rc))
+    pass
 
 def on_message(mosq, obj, msg):
-    print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
+    pass
 
 def on_publish(mosq, obj, mid):
-    print("mid: " + str(mid))
+    pass
 
 def on_subscribe(mosq, obj, mid, granted_qos):
-    print("Subscribed: " + str(mid) + " " + str(granted_qos))
+    pass
 
 def on_log(mosq, obj, level, string):
-    print(string)
+    pass
 
 def send_mqtt_message(config, topic, message):
     host = config.get('mqtt','host')
