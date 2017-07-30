@@ -1,5 +1,12 @@
 #! /usr/bin/python2
 
+# btbutton-mqtt.py
+
+# Bluebooth Button to MQTT messages suitable for Home Assistant
+# Integration by Mark Tearle <mark@tearle.com>
+
+
+# Based on LiFX Btbutton code by Loïc Damien <loic.damien@dzamlo.ch>
 
 # Includes example code from paho-mqtt website by:
 
@@ -37,6 +44,8 @@ import evdev
 import ConfigParser
 import re
 
+# udev code to find unique hardware address of bluetooth button
+
 def find_uniq(dev):
     while dev:
     	 print dev
@@ -52,7 +61,9 @@ def find_by_devname(context, name):
 def clean_id(id):
     return str(re.sub(r'[^a-fA-F0-9]',r'',id))
 
- 
+
+# mqtt code
+
 # Define event callbacks
 def on_connect(mosq, obj, rc):
     print("rc: " + str(rc))
@@ -100,8 +111,11 @@ def send_mqtt_message(config, topic, message):
     mqttc.disconnect()
 
 
+# toggle state on button press and send message
+
 def button(config, device, id, key):
-    print "device %s id %s key %s" % (device,id,key)
+    #
+    # print "device %s id %s key %s" % (device,id,key)
 
     topic = "homeassistant/binary_sensor/btbutton/button%s_%s/state" % (id,key)
     payload = "ON"
@@ -130,7 +144,7 @@ def main(path):
     config.read(['/etc/btbutton.cfg','btbutton.cfg'])
     #
 
-    # send mqtt discovery for homeassistant
+    # send mqtt discovery information for homeassistant
 
     payload = '{"name":"btbutton", "device_class":"motion"}'
     topic = "homeassistant/binary_sensor/btbutton/button%s_big/config" % (description)
@@ -139,23 +153,28 @@ def main(path):
     send_mqtt_message(config,topic,payload)
     #
 
+    # look for button keypresses
+
     device = evdev.InputDevice(path)
     id = description
     device.grab()
-    print device
-    print device.info
+
+    #print device
+    #print device.info
+
     for event in device.read_loop():
         if event.type == evdev.ecodes.EV_KEY:
             event = evdev.categorize(event)
             key_up = event.keystate == evdev.KeyEvent.key_up
             vol_up = event.keycode == 'KEY_VOLUMEUP'
             enter = event.keycode == 'KEY_ENTER'
-	    print event.keystate
+
+	    #print event.keystate
+
             if key_up and enter:
                 small_button(config, device.phys,id)
             elif key_up and vol_up:
                 big_button(config, device.phys,id)
-            print "..."
 
 def usage():
    print("usage: btbutton-mqtt.py </dev/input/event?>")
